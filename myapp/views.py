@@ -51,13 +51,19 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class APIRootView(APIView):
     """
     Кореневий API View, який надає гіперпосилання на основні ресурси.
     """
 
     def get(self, request, format=None):
+        return Response({
+            'products': reverse('product-list', request=request, format=format),
+            'orders': reverse('order-list', request=request, format=format),
+            'users': reverse('user-list', request=request, format=format)
+        })
+
+    def post(self, request, format=None):
         return Response({
             'products': reverse('product-list', request=request, format=format),
             'orders': reverse('order-list', request=request, format=format),
