@@ -1,3 +1,5 @@
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
 from rest_framework import viewsets, status
 from .models import Product, Order, User
 from .serializers import ProductSerializer, OrderSerializer, CustomUserSerializer
@@ -49,6 +51,48 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def home(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    orders = Order.objects.filter(user=request.user)
+    return render(request, 'home.html', {'orders': orders})
+
+
+def register(request):
+    if request.method == 'POST':
+        last_name = request.POST['last_name']
+        first_name = request.POST['first_name']
+        email = request.POST['email']
+        password = request.POST['password']
+        user = User.objects.create_user(email=email, password=password, first_name=first_name, last_name=last_name)
+        return redirect('login')  # Перенаправлення на сторінку логіну після реєстрації
+    return render(request, 'register.html')
+
+
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')  # Перенаправлення на головну сторінку
+    return render(request, 'login.html')
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class ProductViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 
 class APIRootView(APIView):

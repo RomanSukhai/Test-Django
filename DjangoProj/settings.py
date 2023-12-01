@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +42,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'myapp'
 ]
-AUTH_USER_MODEL = 'myapp.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -58,7 +58,7 @@ ROOT_URLCONF = 'DjangoProj.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, '../myapp/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,8 +70,10 @@ TEMPLATES = [
         },
     },
 ]
-
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
 WSGI_APPLICATION = 'DjangoProj.wsgi.application'
+AUTH_USER_MODEL = 'myapp.User'
 
 
 # Database
@@ -80,10 +82,10 @@ WSGI_APPLICATION = 'DjangoProj.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'company',
+        'NAME': 'shop',
         'USER': 'root',
         'PASSWORD': 'namor2004',
-        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
