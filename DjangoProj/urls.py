@@ -19,8 +19,8 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import routers
 
-from myapp.models import Product
-from myapp.views import ProductViewSet, OrderViewSet, CustomUserViewSet, APIRootView, register, login_view,home
+from myapp.models import Product, Order, User
+from myapp.views import ProductViewSet, OrderViewSet, CustomUserViewSet, login_view, register_view, home_view, home
 from rest_framework import permissions
 from django.contrib import admin
 
@@ -40,13 +40,15 @@ schema_view = get_schema_view(
    permission_classes=(permissions.AllowAny,),
 )
 admin.site.register(Product)
+admin.site.register(User)
+admin.site.register(Order)
 
 urlpatterns = [
-    path('register/', register, name='register'),
+    path('register/', register_view, name='register'),
     path('login/', login_view, name='login'),
-    path('home/', home, name='home'),
     path('admin/', admin.site.urls),
     path('', home, name='home'),
+    path('home/',home_view,name='home'),
     # path('', APIRootView.as_view(), name='api-root'),
     path('api/', include(router.urls)),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),

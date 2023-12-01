@@ -1,6 +1,9 @@
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from rest_framework import viewsets, status
+
+from .forms import RegisterForm, LoginForm
 from .models import Product, Order, User
 from .serializers import ProductSerializer, OrderSerializer, CustomUserSerializer
 from rest_framework.response import Response
@@ -52,7 +55,12 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@login_required
+def home_view(request):
+    orders = Order.objects.filter(user=request.user)
 
+    context = {'orders': orders}
+    return render(request, 'home.html', context)
 def home(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -93,6 +101,31 @@ class OrderViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+
+def register_view(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login_url')  # redirect to login page after successful registration
+    else:
+        form = RegisterForm()
+    return render(request, 'register.html', {'form': form})
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        email = request.POST['email']
+        password = request.POST['password']
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home_url')  # redirect to home page after successful login
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
 
 
 class APIRootView(APIView):
