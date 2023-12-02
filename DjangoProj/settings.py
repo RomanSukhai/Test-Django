@@ -81,7 +81,7 @@ AUTH_USER_MODEL = 'myapp.User'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'shop',
+        'NAME': 'shop2',
         'USER': 'root',
         'PASSWORD': 'namor2004',
         'HOST': 'localhost',

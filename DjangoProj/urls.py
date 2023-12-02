@@ -20,7 +20,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import routers
 
-from myapp import views
+from myapp.models import Product, Order, User
 from myapp.views import ProductViewSet, OrderViewSet, CustomUserViewSet, login_view, register_view, home, create_order
 from rest_framework import permissions
 from django.contrib import admin
@@ -39,6 +39,10 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=(permissions.AllowAny,),
 )
+admin.site.register(Product)
+admin.site.register(Order)
+admin.site.register(User)
+
 
 urlpatterns = [
     path('register/', register_view, name='register'),

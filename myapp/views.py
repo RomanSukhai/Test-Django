@@ -1,9 +1,11 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.db import transaction
+from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets, status
 
-from .forms import RegisterForm, LoginForm, OrderForm
+from .forms import RegisterForm, LoginForm
 from .models import Product, Order, User
 from .serializers import ProductSerializer, OrderSerializer, CustomUserSerializer
 from rest_framework.response import Response
@@ -42,17 +44,28 @@ class OrderViewSet(viewsets.ModelViewSet):
         else:
             return Response({"error": "Недостатня кількість товару на складі"}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @login_required
 def create_order(request):
     if request.method == 'POST':
         product_id = request.POST.get('product')
         quantity = request.POST.get('quantity')
-        product = Product.objects.get(id=product_id)
+        product = get_object_or_404(Product, pk=product_id)
+        try:
+            quantity = int(quantity)
+            if product.stock >= quantity:
 
-        order = Order(user=request.user, product=product, quantity=quantity)
-        order.save()
+                with transaction.atomic():
+                    product.stock -= quantity
+                    product.save()
+                    order = Order(user=request.user, product=product, quantity=quantity)
+                    order.save()
 
-        return redirect('home')
+                return redirect('home')
+            else:
+                return HttpResponse("Недостатня кількість товару на складі")
+        except ValueError:
+            return HttpResponse("Кількість має бути цілим числом")
 
     products = Product.objects.all()
     return render(request, 'create_order.html', {'products': products})
@@ -124,7 +137,7 @@ def register_view(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('login')  # redirect to login page after successful registration
+            return redirect('login')
     else:
         form = RegisterForm()
     return render(request, 'register.html', {'form': form})
@@ -138,7 +151,7 @@ def login_view(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')  # redirect to home page after successful login
+            return redirect('home')
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
