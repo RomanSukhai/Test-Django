@@ -13,22 +13,25 @@
     <script src="{% static 'script/bootstrap.bundle.min.js' %}"></script>
     <link rel="stylesheet" href="">
 </head>
+
 <body class="d-flex justify-content-center animated-block">
     <header class="head-point">
         <menu class="mymenu d-flex justify-content-around justify-content-center align-items-center">
             <div class="buttons-container">
-                <button onclick="window.location.href='{% url 'create_order' %}';" class="button-arounder">Створити замовлення</button>
+                <button onclick="window.location.href='{% url 'create_order' %}';" class="button-arounder">Створити
+                    замовлення</button>
             </div>
             <div class="buttons-container">
                 <button onclick="window.location.href='{% url 'logout' %}';" class="button-arounder">Вийти</button>
             </div>
             <div class="buttons-container">
-                <button onclick="window.location.href='{% url 'register' %}';" class="button-arounder">Реєстрація</button>
+                <button onclick="window.location.href='{% url 'register' %}';"
+                    class="button-arounder">Реєстрація</button>
             </div>
-
-
         </menu>
-        <div class="products-block d-flex align-content-around flex-wrap  ">
+        <div class="products-block d-flex align-content-around flex-wrap">
+            
+        
             {% if orders %}
                 <p>Мої Замовлення</p>
                 {% for order in orders %}
@@ -37,7 +40,7 @@
                         <div class="card-body">
                             <p class="card-title">{{ order.product.name }}</p>
                             <p class="card-text">- Кількість: {{ order.quantity }} </p>
-                            <p class="card-text">Про товар:{{ order.description }}</p>
+                            <p class="card-text">Про товар:{{ order.product.description }}</p>
                         </div>
                     </div>
                 {% endfor %}
@@ -45,9 +48,15 @@
                 <p>У вас немає замовлень.</p>
             {% endif %}
         </div>
-        
-    </header>
 
+    </header>
+    {% if messages %}
+    <script type="text/javascript">
+        {% for message in messages %}
+            alert("{{ message }}");
+        {% endfor %}
+    </script>
+{% endif %}
 </body>
 
 </html>

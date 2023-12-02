@@ -1,21 +1,24 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700');
-
-body{
-  background-image: url("../images/back-for-site.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  font-family: "DejaVuSans";
-  color: #262626;
-  margin: 5% 0;
-  overflow: hidden;
+@font-face {
+    font-family: "DejaVuSans";
+    src: url("../fonts/DejaVuSans-Bold.ttf");
 }
+
 .container{
   width: 100%;
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
   margin-left: auto;
+}
+body{
+    background-image: url("../images/back-for-site.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: "DejaVuSans";
+    color:#ffffff;
+    margin: 5% 0;
+    overflow: hidden;
 }
 @media (min-width: 1200px)
 {
@@ -26,7 +29,6 @@ body{
 .d-flex{
   display: flex;
   flex-direction: row;
-  background: #f6f6f6;
   border-radius: 0 0 5px 5px;
   padding: 25px;
 }
@@ -37,12 +39,10 @@ form{
   flex: 2;
 }
 .title{
-  background: -webkit-gradient(linear, left top, right bottom, color-stop(0, #5195A8), color-stop(100, #70EAFF));
-  background: -moz-linear-gradient(top left, #5195A8 0%, #70EAFF 100%);
-  background: -ms-linear-gradient(top left, #5195A8 0%, #70EAFF 100%);
-  background: -o-linear-gradient(top left, #5195A8 0%, #70EAFF 100%);
-  background: linear-gradient(to bottom right, #5195A8 0%, #70EAFF 100%);
-  border-radius:5px 5px 0 0 ;
+  background: rgb(217,255,87);
+  background: rgb(64,70,46);
+  background: linear-gradient(0deg, rgba(64,70,46,1) 0%, rgba(253,105,45,1) 100%);
+  border-radius:30px;
   padding: 20px;
   color: #f6f6f6;
 }
@@ -62,6 +62,7 @@ label>span{
   width: 25%;
   margin-top: 12px;
   padding-right: 10px;
+  color: white;
 }
 input[type="text"], input[type="tel"], input[type="email"], select
 {
@@ -121,12 +122,12 @@ button{
   padding: 10px;
   border: none;
   border-radius: 30px;
-  background: #52ad9c;
+  background: #a88947;
   color: #fff;
   font-size: 15px;
   font-weight: bold;
 }
 button:hover{
   cursor: pointer;
-  background: #428a7d;
+  background: rgb(255, 158, 32);
 }

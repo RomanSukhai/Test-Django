@@ -21,7 +21,8 @@ from drf_yasg import openapi
 from rest_framework import routers
 
 from myapp.models import Product, Order, User
-from myapp.views import ProductViewSet, OrderViewSet, CustomUserViewSet, login_view, register_view, home, create_order
+from myapp.views import ProductViewSet, OrderViewSet, CustomUserViewSet, login_view, register_view, home, \
+     create_order
 from rest_framework import permissions
 from django.contrib import admin
 

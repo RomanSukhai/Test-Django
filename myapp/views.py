@@ -1,10 +1,9 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets, status
-
+from django.contrib import messages
 from .forms import RegisterForm, LoginForm
 from .models import Product, Order, User
 from .serializers import ProductSerializer, OrderSerializer, CustomUserSerializer
@@ -18,56 +17,56 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
 
 
-class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-
-    def create(self, request, *args, **kwargs):
-        product_id = request.data.get('product')
-        user_id = request.data.get('user')
-        quantity = request.data.get('quantity')
-        try:
-            product = Product.objects.get(pk=product_id)
-            user = User.objects.get(pk=user_id)
-        except Product.DoesNotExist:
-            return Response({"error": "Продукт не знайдено"}, status=status.HTTP_404_NOT_FOUND)
-        try:
-            quantity = int(quantity)
-        except (ValueError, TypeError):
-            return Response({"error": "Кількість має бути цілим числом"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if product.stock >= quantity:
-            product.stock -= quantity
-            product.save()
-            user.save()
-            return super().create(request, *args, **kwargs)
-        else:
-            return Response({"error": "Недостатня кількість товару на складі"}, status=status.HTTP_400_BAD_REQUEST)
+# class OrderViewSet(viewsets.ModelViewSet):
+#     queryset = Order.objects.all()
+#     serializer_class = OrderSerializer
+#
+#     def create(self, request, *args, **kwargs):
+#         product_id = request.data.get('product')
+#         user_id = request.data.get('user')
+#         quantity = request.data.get('quantity')
+#         try:
+#             product = Product.objects.get(pk=product_id)
+#             user = User.objects.get(pk=user_id)
+#         except Product.DoesNotExist:
+#             return Response({"error": "Продукт не знайдено"}, status=status.HTTP_404_NOT_FOUND)
+#         try:
+#             quantity = int(quantity)
+#         except (ValueError, TypeError):
+#             return Response({"error": "Кількість має бути цілим числом"}, status=status.HTTP_400_BAD_REQUEST)
+#
+#         if product.stock >= quantity:
+#             product.stock -= quantity
+#             product.save()
+#             user.save()
+#             return super().create(request, *args, **kwargs)
+#         else:
+#             return Response({"error": "Недостатня кількість товару на складі"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @login_required
 def create_order(request):
+    products = Product.objects.all()
     if request.method == 'POST':
         product_id = request.POST.get('product')
         quantity = request.POST.get('quantity')
         product = get_object_or_404(Product, pk=product_id)
+
         try:
             quantity = int(quantity)
             if product.stock >= quantity:
-
                 with transaction.atomic():
                     product.stock -= quantity
                     product.save()
                     order = Order(user=request.user, product=product, quantity=quantity)
                     order.save()
-
+                messages.success(request, "Замовлення успішно створено.")
                 return redirect('home')
             else:
-                return HttpResponse("Недостатня кількість товару на складі")
+                messages.error(request, "Недостатня кількість товару на складі.")
         except ValueError:
-            return HttpResponse("Кількість має бути цілим числом")
+            messages.error(request, "Кількість має бути цілим числом.")
 
-    products = Product.objects.all()
     return render(request, 'create_order.html', {'products': products})
 
 
@@ -87,9 +86,10 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 @login_required
 def home_view(request):
     orders = Order.objects.filter(user=request.user)
-
     context = {'orders': orders}
     return render(request, 'home.html', context)
+
+
 def home(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -103,8 +103,14 @@ def register(request):
         first_name = request.POST['first_name']
         email = request.POST['email']
         password = request.POST['password']
-        user = User.objects.create_user(email=email, password=password, first_name=first_name, last_name=last_name)
-        return redirect('login')  # Перенаправлення на сторінку логіну після реєстрації
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Користувач з такою електронною поштою вже існує.")
+            return render(request, 'register.html')
+
+        user = User.objects.create_user(username=email, email=email, password=password, first_name=first_name, last_name=last_name)
+        messages.success(request, "Реєстрація успішна. Тепер ви можете увійти.")
+        return redirect('login')
+
     return render(request, 'register.html')
 
 
@@ -115,7 +121,7 @@ def login_view(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')  # Перенаправлення на головну сторінку
+            return redirect('home')
     return render(request, 'login.html')
 
 
