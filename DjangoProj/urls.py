@@ -14,13 +14,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.contrib.auth.views import LogoutView
 from django.urls import path, re_path, include
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import routers
 
-from myapp.models import Product, Order, User
-from myapp.views import ProductViewSet, OrderViewSet, CustomUserViewSet, login_view, register_view, home_view, home
+from myapp import views
+from myapp.views import ProductViewSet, OrderViewSet, CustomUserViewSet, login_view, register_view, home, create_order
 from rest_framework import permissions
 from django.contrib import admin
 
@@ -29,26 +30,24 @@ router.register(r'products', ProductViewSet)
 router.register(r'orders', OrderViewSet)
 router.register(r'users', CustomUserViewSet)
 
-
 schema_view = get_schema_view(
-   openapi.Info(
-      title="My API",
-      default_version='v1',
-      description="API for my project",
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+    openapi.Info(
+        title="My API",
+        default_version='v1',
+        description="API for my project",
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
-admin.site.register(Product)
-admin.site.register(User)
-admin.site.register(Order)
 
 urlpatterns = [
     path('register/', register_view, name='register'),
+    path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
     path('login/', login_view, name='login'),
     path('admin/', admin.site.urls),
+    path('create-order/', create_order, name='create_order'),
     path('', home, name='home'),
-    path('home/',home_view,name='home'),
+    path('home/', home, name='home'),
     # path('', APIRootView.as_view(), name='api-root'),
     path('api/', include(router.urls)),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),

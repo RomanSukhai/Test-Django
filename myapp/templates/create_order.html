@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'style/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'style/order.css' %}" rel="stylesheet">
+    <link href="{% static 'style/main.css' %}" rel="stylesheet">
+    <script src="{% static 'script/bootstrap.bundle.min.js' %}"></script>
+    <title>Document</title>
+</head>
+
+<body class="d-flex justify-content-around align-items-center">
+    <!-- <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Створити Замовлення</button>
+    </form> -->
+    <div class="container">
+        <div class="title">
+            <h2>Product Order Form</h2>
+        </div>
+        <form action="" method="post">
+            {% csrf_token %}
+            <label>
+                <span>Product</span>
+                <select name="product" required>
+                    <option value="">Select a product...</option>
+                    {% for product in products %}
+                        <option value="{{ product.id }}">{{ product.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Quantity</span>
+                <input type="number" name="quantity" min="1" required>
+            </label>
+            <button type="submit">Place Order</button>
+        </form>
+    </div>
+    
+</body>
+
+</html>

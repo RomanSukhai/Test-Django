@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,19 +6,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="{% static 'style/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'style/reserv.css' %}" rel="stylesheet">
+    <link href="{% static 'style/main.css' %}" rel="stylesheet">
+    <script src="{% static 'script/script.js' %}"></script>
+    <script src="{% static 'script/bootstrap.bundle.min.js' %}"></script>
+    <link rel="stylesheet" href="">
 </head>
+<body class="d-flex justify-content-center animated-block">
+    <header class="head-point">
+        <menu class="mymenu d-flex justify-content-around justify-content-center align-items-center">
+            <div class="buttons-container">
+                <button onclick="window.location.href='{% url 'create_order' %}';" class="button-arounder">Створити замовлення</button>
+            </div>
+            <div class="buttons-container">
+                <button onclick="window.location.href='{% url 'logout' %}';" class="button-arounder">Вийти</button>
+            </div>
+            <div class="buttons-container">
+                <button onclick="window.location.href='{% url 'register' %}';" class="button-arounder">Реєстрація</button>
+            </div>
 
-<body>
-    {% if orders %}
-    <h2>Мої Замовлення</h2>
-    <ul>
-        {% for order in orders %}
-            <li>Замовлення {{ order.id }}: {{ order.product.name }} - Кількість: {{ order.quantity }}</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>У вас немає замовлень.</p>
-    {% endif %}
+
+        </menu>
+        <div class="products-block d-flex align-content-around flex-wrap  ">
+            {% if orders %}
+                <p>Мої Замовлення</p>
+                {% for order in orders %}
+                    <div class="card perfer-card m-2" style="width: 18rem;">
+                        <img class="card-img-top" src="{% static 'images/product.png' %}" alt="Card image cap">
+                        <div class="card-body">
+                            <p class="card-title">{{ order.product.name }}</p>
+                            <p class="card-text">- Кількість: {{ order.quantity }} </p>
+                            <p class="card-text">Про товар:{{ order.description }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>У вас немає замовлень.</p>
+            {% endif %}
+        </div>
+        
+    </header>
 
 </body>
 

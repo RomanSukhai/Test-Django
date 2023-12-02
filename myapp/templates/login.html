@@ -1,15 +1,40 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'style/main.css' %}" rel="stylesheet">
+    <link href="{% static 'style/registration.css' %}" rel="stylesheet">
+    <script src="{% static 'script/script.js' %}"></script>
     <title>Document</title>
 </head>
 <body>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
+    <div class="wrapper animated-block">
+        <h2>Логін</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="input-box">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="error">{{ form.email.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="input-box">
+                {{ form.password.label_tag }}
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="error">{{ form.password.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="input-box button">
+                <input type="submit" value="Увійти">
+            </div>
+            <div class="text">
+                <h3>Не зареєстровані? <a href="{% url 'register' %}">Зареєструватися</a></h3>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

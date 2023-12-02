@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from rest_framework import viewsets, status
 
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, OrderForm
 from .models import Product, Order, User
 from .serializers import ProductSerializer, OrderSerializer, CustomUserSerializer
 from rest_framework.response import Response
@@ -41,6 +41,22 @@ class OrderViewSet(viewsets.ModelViewSet):
             return super().create(request, *args, **kwargs)
         else:
             return Response({"error": "Недостатня кількість товару на складі"}, status=status.HTTP_400_BAD_REQUEST)
+
+@login_required
+def create_order(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product')
+        quantity = request.POST.get('quantity')
+        product = Product.objects.get(id=product_id)
+
+        order = Order(user=request.user, product=product, quantity=quantity)
+        order.save()
+
+        return redirect('home')
+
+    products = Product.objects.all()
+    return render(request, 'create_order.html', {'products': products})
+
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -108,7 +124,7 @@ def register_view(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('login_url')  # redirect to login page after successful registration
+            return redirect('login')  # redirect to login page after successful registration
     else:
         form = RegisterForm()
     return render(request, 'register.html', {'form': form})
@@ -122,7 +138,7 @@ def login_view(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home_url')  # redirect to home page after successful login
+            return redirect('home')  # redirect to home page after successful login
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
