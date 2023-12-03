@@ -12,9 +12,9 @@ from rest_framework.views import APIView
 from rest_framework.reverse import reverse
 
 
-class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+# class ProductViewSet(viewsets.ModelViewSet):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
 
 
 # class OrderViewSet(viewsets.ModelViewSet):
@@ -104,11 +104,8 @@ def register(request):
         email = request.POST['email']
         password = request.POST['password']
         if User.objects.filter(email=email).exists():
-            messages.error(request, "Користувач з такою електронною поштою вже існує.")
             return render(request, 'register.html')
-
         user = User.objects.create_user(username=email, email=email, password=password, first_name=first_name, last_name=last_name)
-        messages.success(request, "Реєстрація успішна. Тепер ви можете увійти.")
         return redirect('login')
 
     return render(request, 'register.html')
